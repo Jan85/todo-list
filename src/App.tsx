@@ -79,7 +79,7 @@ function App() {
   const [dueDate, setDueDate] = useState('');
   const [priority, setPriority] = useState<Priority>('medium');
   const [filter, setFilter] = useState<FilterType>('all');
-  const [sortBy, setSortBy] = useState<SortType>('priority');
+  const [sortBy] = useState<SortType>('priority');
   const [isDark, setIsDark] = useState(() => {
     const saved = localStorage.getItem('theme');
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
