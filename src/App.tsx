@@ -173,7 +173,7 @@ function App() {
             </svg>
           </div>
           <div className="header-text">
-            <h1><span className="flowy">Flowy</span> Todo</h1>
+            <h1>My Todo List</h1>
             <p>Organize your day effortlessly</p>
           </div>
         </div>
