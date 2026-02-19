@@ -2,6 +2,50 @@ import { useState, useEffect } from 'react';
 import type { Todo, Priority, FilterType, SortType } from './types';
 import './App.css';
 
+const translations = {
+  en: {
+    title: 'My Todo List',
+    subtitle: 'Organize your day effortlessly',
+    totalTasks: 'Total Tasks',
+    inProgress: 'In Progress',
+    completed: 'Completed',
+    addTaskPlaceholder: 'Add a new task...',
+    noCategory: 'No category',
+    work: 'Work',
+    personal: 'Personal',
+    other: 'Other',
+    all: 'All',
+    active: 'Active',
+    done: 'Done',
+    noTasks: 'No tasks here.',
+    clearCompleted: 'Clear completed',
+    today: 'Today',
+    tomorrow: 'Tomorrow',
+  },
+  zh: {
+    title: '我的待辦事項',
+    subtitle: '輕鬆安排您的一天',
+    totalTasks: '總任務',
+    inProgress: '進行中',
+    completed: '已完成',
+    addTaskPlaceholder: '新增任務...',
+    noCategory: '無分類',
+    work: '工作',
+    personal: '個人',
+    other: '其他',
+    all: '全部',
+    active: '進行中',
+    done: '已完成',
+    noTasks: '這裡沒有任務。',
+    clearCompleted: '清除已完成',
+    today: '今天',
+    tomorrow: '明天',
+  }
+};
+
+type Language = 'en' | 'zh';
+type TranslationKey = keyof typeof translations.en;
+
 const PRIORITY_ORDER: Record<Priority, number> = {
   high: 0,
   medium: 1,
@@ -12,6 +56,12 @@ const PRIORITY_TEXT: Record<Priority, string> = {
   high: 'High',
   medium: 'Medium',
   low: 'Low',
+};
+
+const PRIORITY_TEXT_ZH: Record<Priority, string> = {
+  high: '高',
+  medium: '中',
+  low: '低',
 };
 
 const PRIORITY_CLASS: Record<Priority, string> = {
@@ -35,6 +85,14 @@ function App() {
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     return saved ? saved === 'dark' : prefersDark;
   });
+  const [language, setLanguage] = useState<Language>(() => {
+    const saved = localStorage.getItem('language');
+    return (saved as Language) || 'en';
+  });
+
+  const t = (key: TranslationKey): string => {
+    return translations[language][key];
+  };
 
   useEffect(() => {
     localStorage.setItem('todos', JSON.stringify(todos));
@@ -45,8 +103,16 @@ function App() {
     localStorage.setItem('theme', isDark ? 'dark' : 'light');
   }, [isDark]);
 
+  useEffect(() => {
+    localStorage.setItem('language', language);
+  }, [language]);
+
   const toggleTheme = () => {
     setIsDark(!isDark);
+  };
+
+  const toggleLanguage = () => {
+    setLanguage(language === 'en' ? 'zh' : 'en');
   };
 
   const addTodo = () => {
@@ -99,10 +165,10 @@ function App() {
     tomorrow.setHours(0, 0, 0, 0);
     date.setHours(0, 0, 0, 0);
     
-    if (date.getTime() === today.getTime()) return 'Today';
-    if (date.getTime() === tomorrow.getTime()) return 'Tomorrow';
+    if (date.getTime() === today.getTime()) return t('today');
+    if (date.getTime() === tomorrow.getTime()) return t('tomorrow');
     
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    return date.toLocaleDateString(language === 'zh' ? 'zh-TW' : 'en-US', { month: 'short', day: 'numeric' });
   };
 
   const formatTime = (dateStr: string): string => {
@@ -112,6 +178,13 @@ function App() {
     const ampm = h >= 12 ? 'pm' : 'am';
     h = h % 12 || 12;
     return `${ampm} ${h}:${m}`;
+  };
+
+  const getPriorityText = (priority: Priority): string => {
+    if (language === 'zh') {
+      return PRIORITY_TEXT_ZH[priority];
+    }
+    return PRIORITY_TEXT[priority];
   };
 
   const sortTodos = (todoArray: Todo[]): Todo[] => {
@@ -159,8 +232,11 @@ function App() {
     <div className="container">
       {/* Top bar */}
       <div className="topbar">
+        <button className="theme-btn" onClick={toggleLanguage} title="Toggle language">
+          {language === 'en' ? '中' : 'EN'}
+        </button>
         <button className="theme-btn" onClick={toggleTheme} title="Toggle dark mode">
-          🌐
+          🌙
         </button>
       </div>
 
@@ -173,8 +249,8 @@ function App() {
             </svg>
           </div>
           <div className="header-text">
-            <h1>My Todo List</h1>
-            <p>Organize your day effortlessly</p>
+            <h1>{t('title')}</h1>
+            <p>{t('subtitle')}</p>
           </div>
         </div>
 
@@ -182,15 +258,15 @@ function App() {
         <div className="stats-row">
           <div className="stat-card">
             <div className="stat-num total">{todos.length}</div>
-            <div className="stat-label">Total Tasks</div>
+            <div className="stat-label">{t('totalTasks')}</div>
           </div>
           <div className="stat-card">
             <div className="stat-num inprog">{activeCount}</div>
-            <div className="stat-label">In Progress</div>
+            <div className="stat-label">{t('inProgress')}</div>
           </div>
           <div className="stat-card">
             <div className="stat-num done">{completedCount}</div>
-            <div className="stat-label">Completed</div>
+            <div className="stat-label">{t('completed')}</div>
           </div>
         </div>
 
@@ -199,7 +275,7 @@ function App() {
           <input
             type="text"
             id="todo-input"
-            placeholder="Add a new task..."
+            placeholder={t('addTaskPlaceholder')}
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && addTodo()}
@@ -219,10 +295,10 @@ function App() {
             value={priority}
             onChange={(e) => setPriority(e.target.value as Priority)}
           >
-            <option value="none">No category</option>
-            <option value="high">Work</option>
-            <option value="medium">Personal</option>
-            <option value="low">Other</option>
+            <option value="none">{t('noCategory')}</option>
+            <option value="high">{t('work')}</option>
+            <option value="medium">{t('personal')}</option>
+            <option value="low">{t('other')}</option>
           </select>
           <input
             type="date"
@@ -239,26 +315,26 @@ function App() {
             className={`filter-btn ${filter === 'all' ? 'active' : ''}`}
             onClick={() => setFilter('all')}
           >
-            All
+            {t('all')}
           </button>
           <button 
             className={`filter-btn ${filter === 'active' ? 'active' : ''}`}
             onClick={() => setFilter('active')}
           >
-            Active
+            {t('active')}
           </button>
           <button 
             className={`filter-btn ${filter === 'completed' ? 'active' : ''}`}
             onClick={() => setFilter('completed')}
           >
-            Done
+            {t('done')}
           </button>
         </div>
 
         {/* Task list */}
         <ul className="todo-list">
           {sortedTodos.length === 0 ? (
-            <li className="empty-state">No tasks here.</li>
+            <li className="empty-state">{t('noTasks')}</li>
           ) : (
             sortedTodos.map(todo => {
               const overdue = isOverdue(todo.dueDate, todo.completed);
@@ -276,7 +352,7 @@ function App() {
                     </span>
                     <div className="todo-meta">
                       <span className={`priority-badge ${PRIORITY_CLASS[todo.priority]}`}>
-                        {PRIORITY_TEXT[todo.priority]}
+                        {getPriorityText(todo.priority)}
                       </span>
                       {todo.dueDate && (
                         <span className={`task-time ${overdue ? 'overdue' : ''}`}>
@@ -298,7 +374,7 @@ function App() {
         {completedCount > 0 && (
           <div className="footer">
             <button className="clear-btn" onClick={clearCompleted}>
-              Clear completed
+              {t('clearCompleted')}
             </button>
           </div>
         )}
