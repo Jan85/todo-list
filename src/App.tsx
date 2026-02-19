@@ -296,9 +296,9 @@ function App() {
             onChange={(e) => setPriority(e.target.value as Priority)}
           >
             <option value="none">{t('noCategory')}</option>
-            <option value="high">{t('work')}</option>
-            <option value="medium">{t('personal')}</option>
-            <option value="low">{t('other')}</option>
+            <option value="high">{language === 'zh' ? '高' : 'High'}</option>
+            <option value="medium">{language === 'zh' ? '中' : 'Medium'}</option>
+            <option value="low">{language === 'zh' ? '低' : 'Low'}</option>
           </select>
           <input
             type="date"
