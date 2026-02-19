@@ -394,34 +394,35 @@ body {
   letter-spacing: 0.01em;
 }
 
+/* Priority badges */
 .priority-high {
-  background: #ede9f6;
-  color: #7c3aed;
+  background: #ffebee;
+  color: #c62828;
 }
 
 .priority-medium {
-  background: #fce7f3;
-  color: #db2777;
+  background: #fff3e0;
+  color: #e65100;
 }
 
 .priority-low {
-  background: #e0f2fe;
-  color: #0284c7;
+  background: #e8f5e9;
+  color: #2e7d32;
 }
 
 [data-theme="dark"] .priority-high {
-  background: #2d2350;
-  color: #c4b5fd;
+  background: #3d1a1a;
+  color: #f48fb1;
 }
 
 [data-theme="dark"] .priority-medium {
-  background: #3d1a2e;
-  color: #f9a8d4;
+  background: #3d2e1a;
+  color: #ffe082;
 }
 
 [data-theme="dark"] .priority-low {
-  background: #0c2a3a;
-  color: #7dd3fc;
+  background: #1a3d1a;
+  color: #a5d6a7;
 }
 
 .task-time {
